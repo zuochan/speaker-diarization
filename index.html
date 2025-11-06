@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>話者分離デモ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    input[type="file"] {
+      margin: 20px 0;
+    }
+    
+    #status {
+      padding: 15px;
+      margin: 20px 0;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    th {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    /* === Audio player & timeline === */
+    #playerWrap { margin: 16px 0 10px; }
+    #player { width: 100%; }
+    #timebar { margin: 8px 0; font-variant-numeric: tabular-nums; color: #333; }
+
+    #timeline {
+      position: relative;
+      height: 18px;
+      background: #f3f3f3;
+      border-radius: 9px;
+      overflow: hidden;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+      cursor: pointer;
+    }
+    .segment {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-radius: 9px;
+      opacity: 0.5;
+      transition: opacity .15s ease;
+    }
+    .segment.spk0 { background: #2ecc71; }
+    .segment.spk1 { background: #ff7eb6; }
+    .segment.active {
+      opacity: 0.9;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      animation: glow 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes glow { from { filter: brightness(1.0);} to { filter: brightness(1.25);} }
+    .playhead {
+      position: absolute;
+      top: -2px;
+      width: 2px;
+      height: 22px;
+      background: #111;
+    }
+    .legend { margin-top: 6px; font-size: 12px; color: #666; display:flex; gap:12px; align-items:center; }
+    .chip { display:inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .chip.spk0 { background:#2ecc71; }
+    .chip.spk1 { background:#ff7eb6; }
+
+    /* Table highlight when syncing */
+    tr.active-row { outline: 2px solid #ffd54f; background: #fff8e1 !important; }
+  </style>
+</head>
+<body>
+  <h1>🎤 話者分離デモ</h1>
+  
+  <div>
+    <button id="initBtn">1. モデルを初期化</button>
+    <p><small>※初回は数十秒かかります（モデルをダウンロード）</small></p>
+  </div>
+  
+  <div>
+    <input type="file" id="audioFile" accept="audio/*">
+    <button id="processBtn" disabled>2. 話者分離を実行</button>
+  </div>
+  
+  <div id="playerWrap">
+    <audio id="player" controls aria-label="元音声プレーヤー"></audio>
+    <div id="timebar">
+      <span id="currentTime">00:00.0</span> / <span id="duration">00:00.0</span>
+    </div>
+    <div id="timeline" tabindex="0" aria-label="話者タイムライン"></div>
+    <div class="legend" aria-hidden="true">
+      <span class="chip spk0"></span>話者_0
+      <span class="chip spk1" style="margin-left:12px;"></span>話者_1
+    </div>
+  </div>
+  
+  <div id="status">準備中...</div>
+  
+  <div id="result"></div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
